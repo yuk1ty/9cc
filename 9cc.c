@@ -6,6 +6,10 @@
 
 enum {
     TK_NUM = 256,
+    TK_EQ,
+    TK_NE,
+    TK_LE,
+    TK_GE,
     TK_EOF,
 };
 
@@ -58,8 +62,40 @@ void tokenize() {
             continue;
         }
 
+        if (strncmp(p, ">=", 2) == 0) {
+            tokens[i].ty = TK_GE;
+            tokens[i].input = p;
+            i++;
+            p += 2; 
+            continue;
+        }
+        
+        if (strncmp(p, "<=", 2) == 0) {
+            tokens[i].ty = TK_LE;
+            tokens[i].input = p;
+            i++;
+            p += 2;
+            continue;
+        }
+
+        if (strncmp(p, "==", 2) == 0) {
+            tokens[i].ty = TK_EQ;
+            tokens[i].input = p;
+            i++;
+            p += 2;
+            continue;
+        }
+
+        if (strncmp(p, "!=", 2) == 0) {
+            tokens[i].ty = TK_NE;
+            tokens[i].input = p;
+            i++;
+            p += 2;
+            continue;
+        }
+
         if (*p == '+' || *p == '-' || *p == '*' || *p == '/' 
-                || *p == '(' || *p == ')') {
+                || *p == '(' || *p == ')' || *p == '>' || *p == '<') {
             tokens[i].ty = *p;
             tokens[i].input = p;
             i++;
