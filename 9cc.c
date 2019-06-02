@@ -177,9 +177,9 @@ Node *rational() {
         } else if (consume(TK_LE)) {
             node = new_node(TK_LE, node, add());
         } else if (consume('>')) {
-            node = new_node('>', node, add());
+            node = new_node('>', add(), node);
         } else if (consume(TK_GE)) {
-            node = new_node(TK_GE, node, add());
+            node = new_node(TK_GE, add(), node);
         } else {
             return node;
         }
@@ -267,6 +267,29 @@ void gen(Node *node) {
     case '/':
         printf("    cqo\n");
         printf("    idiv rdi\n");
+        break;
+    case '<':
+    case '>':
+        printf("    cmp rax, rdi\n");
+        printf("    setl al\n");
+        printf("    movzb rax, al\n");
+        break;
+    case TK_LE:
+    case TK_GE:
+        printf("    cmp rax, rdi\n");
+        printf("    setle al\n");
+        printf("    movzb rax, al\n");
+        break;
+    case TK_EQ:
+        printf("    cmp rax, rdi\n");
+        printf("    sete al\n");
+        printf("    movzb rax, al\n");
+        break;
+    case TK_NE:
+        printf("    cmp rax, rdi\n");
+        printf("    setne al\n");
+        printf("    movzb rax, al\n");
+        break;
     }
 
     printf("    push rax\n");
