@@ -19,6 +19,25 @@ typedef struct {
     char *input; // for error handling
 } Token;
 
+Token *new_token(int ty, char *input);
+
+Token *new_token(int ty, char *input) {
+    Token *token = malloc(sizeof(Token));
+    token->ty = ty;
+    token->input = input;
+    return token;
+}
+
+Token *new_token_val(int ty, int val, char *input);
+
+Token *new_token_val(int ty, int val, char *input) {
+    Token *token = malloc(sizeof(Token));
+    token->ty = ty;
+    token->val = val;
+    token->input = input;
+    return token;
+}
+
 enum {
     ND_NUM = 256,
 };
@@ -38,7 +57,10 @@ typedef struct {
 
 char *user_input;
 
-Token tokens[100];
+Vector *tokens;
+Vector *new_vector();
+void vec_push(Vector *vec, void *elem);
+
 int pos = 0;
 
 void error(char *fmt, ...) {
@@ -58,6 +80,7 @@ void error_at(char *loc, char *msg) {
 }
 
 void tokenize() {
+    tokens = new_vector();
     char *p = user_input;
 
     int i = 0;
@@ -69,32 +92,32 @@ void tokenize() {
         }
 
         if (strncmp(p, ">=", 2) == 0) {
-            tokens[i].ty = TK_GE;
-            tokens[i].input = p;
+            Token *token = new_token(TK_GE, p);
+            vec_push(tokens, (void *) token);
             i++;
             p += 2; 
             continue;
         }
         
         if (strncmp(p, "<=", 2) == 0) {
-            tokens[i].ty = TK_LE;
-            tokens[i].input = p;
+            Token *token = new_token(TK_LE, p);
+            vec_push(tokens, (void *) token);
             i++;
             p += 2;
             continue;
         }
 
         if (strncmp(p, "==", 2) == 0) {
-            tokens[i].ty = TK_EQ;
-            tokens[i].input = p;
+            Token *token = new_token(TK_EQ, p);
+            vec_push(tokens, (void *) token);
             i++;
             p += 2;
             continue;
         }
 
         if (strncmp(p, "!=", 2) == 0) {
-            tokens[i].ty = TK_NE;
-            tokens[i].input = p;
+            Token *token = new_token(TK_NE, p);
+            vec_push(tokens, (void *) token);
             i++;
             p += 2;
             continue;
@@ -102,17 +125,16 @@ void tokenize() {
 
         if (*p == '+' || *p == '-' || *p == '*' || *p == '/' 
                 || *p == '(' || *p == ')' || *p == '>' || *p == '<') {
-            tokens[i].ty = *p;
-            tokens[i].input = p;
+            Token *token = new_token(*p, p);
+            vec_push(tokens, (void *) token);
             i++;
             p++;
             continue;
         }
 
         if (isdigit(*p)) {
-            tokens[i].ty = TK_NUM;
-            tokens[i].input = p;
-            tokens[i].val = strtol(p, &p, 10);
+            Token *token = new_token_val(TK_NUM, strtol(p, &p, 10), p);
+            vec_push(tokens, (void *) token);
             i++;
             continue;
         }
@@ -120,8 +142,8 @@ void tokenize() {
         error_at(p, "トークナイズできません");
     }
 
-    tokens[i].ty = TK_EOF;
-    tokens[i].input = p;
+    Token *eof = new_token(TK_EOF, p);
+    vec_push(tokens, (void *) eof);
 }
 
 Node *new_node(int ty, Node *lhs, Node *rhs) {
@@ -140,7 +162,9 @@ Node *new_node_num(int val) {
 }
 
 int consume(int ty) {
-    if (tokens[pos].ty != ty) {
+    Token *t = tokens->data[pos];
+
+    if (t->ty != ty) {
         return 0;
     }
     pos++;
@@ -221,19 +245,22 @@ Node *mul() {
 }
 
 Node *term() {
+    Token *t = tokens->data[pos];
+
     if (consume('(')) {
         Node *node = expr();
         if (!consume(')')) {
-            error_at(tokens[pos].input, "開きカッコに対応する閉じカッコがありません");
+            error_at(t->input, "開きカッコに対応する閉じカッコがありません");
         }
         return node;
     }
 
-    if (tokens[pos].ty == TK_NUM) {
-        return new_node_num(tokens[pos++].val);
+    if (t->ty == TK_NUM) {
+        Token *nt = tokens->data[pos++];
+        return new_node_num(nt->val);
     }
 
-    error_at(tokens[pos].input, "数値でも開きカッコでもないトークンです");
+    error_at(t->input, "数値でも開きカッコでもないトークンです");
 }
 
 Node *unary() {
