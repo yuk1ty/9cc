@@ -6,10 +6,10 @@
 
 enum {
     TK_NUM = 256,
-    TK_EQ,
-    TK_NE,
-    TK_LE,
-    TK_GE,
+    TK_EQ, // ==
+    TK_NE, // !=
+    TK_LE, // <=
+    TK_GE, // >=
     TK_EOF,
 };
 
@@ -142,11 +142,51 @@ int consume(int ty) {
 }
 
 Node *expr();
+Node *equality();
+Node *rational();
+Node *add();
 Node *mul();
 Node *term();
 Node *unary();
 
 Node *expr() {
+    Node *node = equality();
+    return node;
+}
+
+Node *equality() {
+    Node *node = rational();
+
+    for (;;) {
+        if (consume(TK_EQ)) {
+            node = new_node(TK_EQ, node, rational());
+        } else if (consume(TK_NE)) {
+            node = new_node(TK_NE, node, rational());
+        } else {
+            return node;
+        }
+    }
+}
+
+Node *rational() {
+    Node *node = add();
+
+    for (;;) {
+        if (consume('<')) {
+            node = new_node('<', node, add());
+        } else if (consume(TK_LE)) {
+            node = new_node(TK_LE, node, add());
+        } else if (consume('>')) {
+            node = new_node('>', node, add());
+        } else if (consume(TK_GE)) {
+            node = new_node(TK_GE, node, add());
+        } else {
+            return node;
+        }
+    }
+}
+
+Node *add() {
     Node *node = mul();
 
     for (;;) {
