@@ -16,6 +16,7 @@ Token *new_token_val(int ty, int val, char *input);
 
 enum {
     TK_NUM = 256,
+    TK_IDENT, // identifiers
     TK_EQ, // ==
     TK_NE, // !=
     TK_LE, // <=

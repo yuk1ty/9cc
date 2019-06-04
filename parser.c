@@ -68,6 +68,14 @@ void tokenize() {
             continue;
         }
 
+        if ('a' <= *p && *p <= 'z') {
+            Token *token = new_token(TK_IDENT, p);
+            vec_push(tokens, (void *) token);
+            i++;
+            p++;
+            continue;
+        }
+
         if (isdigit(*p)) {
             Token *token = new_token_val(TK_NUM, strtol(p, &p, 10), p);
             vec_push(tokens, (void *) token);
