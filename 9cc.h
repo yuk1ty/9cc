@@ -41,6 +41,7 @@ typedef struct Node {
     struct Node *lhs;
     struct Node *rhs;
     int val;
+    char name;
 } Node;
 
 Node *expr();
@@ -50,9 +51,11 @@ Node *add();
 Node *mul();
 Node *term();
 Node *unary();
+void program();
 
 enum {
     ND_NUM = 256,
+    ND_IDENT,
 };
 
 // tests

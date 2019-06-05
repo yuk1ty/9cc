@@ -115,9 +115,35 @@ int consume(int ty) {
     return 1;
 }
 
-Node *expr() {
+Node *code[100];
+
+Node *assign() {
     Node *node = equality();
+    if (consume('=')) {
+        node = new_node('=', node, assign());
+    }
     return node;
+}
+
+Node *expr() {
+    Node *node = assign();
+    return node;
+}
+
+Node *stmt() {
+    Node *node = expr();
+    if (!consume(';')) {
+        error_at(((Token *)tokens->data[pos])->input, "';'ではないトークンです");
+    }
+    return node;
+}
+
+void program() {
+    int i = 0;
+    while(((Token *)tokens->data[pos])->ty != TK_EOF) {
+        code[i++] = stmt();
+    }
+    code[i] = NULL;
 }
 
 Node *equality() {
