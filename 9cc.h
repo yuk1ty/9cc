@@ -45,12 +45,6 @@ typedef struct Node {
 } Node;
 
 Node *expr();
-Node *equality();
-Node *rational();
-Node *add();
-Node *mul();
-Node *term();
-Node *unary();
 void program();
 
 enum {

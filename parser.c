@@ -116,6 +116,22 @@ int consume(int ty) {
 }
 
 Node *code[100];
+Node *assign();
+Node *stmt();
+Node *equality();
+Node *rational();
+Node *add();
+Node *mul();
+Node *term();
+Node *unary();
+
+void program() {
+    int i = 0;
+    while(((Token *)tokens->data[pos])->ty != TK_EOF) {
+        code[i++] = stmt();
+    }
+    code[i] = NULL;
+}
 
 Node *assign() {
     Node *node = equality();
@@ -136,14 +152,6 @@ Node *stmt() {
         error_at(((Token *)tokens->data[pos])->input, "';'ではないトークンです");
     }
     return node;
-}
-
-void program() {
-    int i = 0;
-    while(((Token *)tokens->data[pos])->ty != TK_EOF) {
-        code[i++] = stmt();
-    }
-    code[i] = NULL;
 }
 
 Node *equality() {
