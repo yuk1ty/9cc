@@ -60,7 +60,8 @@ void tokenize() {
         }
 
         if (*p == '+' || *p == '-' || *p == '*' || *p == '/' 
-                || *p == '(' || *p == ')' || *p == '>' || *p == '<') {
+                || *p == '(' || *p == ')' || *p == '>' || *p == '<' 
+                || *p == ';' || *p == '=') {
             Token *token = new_token(*p, p);
             vec_push(tokens, (void *) token);
             i++;
@@ -105,6 +106,13 @@ Node *new_node_num(int val) {
     return node;
 }
 
+Node *new_node_ident(char name) {
+    Node *node = malloc(sizeof(Node));
+    node->ty = ND_IDENT;
+    node->name = name;
+    return node;
+}
+
 int consume(int ty) {
     Token *t = tokens->data[pos];
 
@@ -115,7 +123,6 @@ int consume(int ty) {
     return 1;
 }
 
-Node *code[100];
 Node *assign();
 Node *stmt();
 Node *equality();
@@ -228,6 +235,11 @@ Node *term() {
     if (t->ty == TK_NUM) {
         Token *nt = tokens->data[pos++];
         return new_node_num(nt->val);
+    }
+
+    if (t->ty == TK_IDENT) {
+        Token *nt = tokens->data[pos++];
+        return new_node_ident(nt->input[0]); // TODO 違うかも？
     }
 
     error_at(t->input, "数値でも開きカッコでもないトークンです");
