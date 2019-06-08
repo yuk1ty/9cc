@@ -44,6 +44,7 @@ typedef struct Node {
     char name;
 } Node;
 
+Node *code[100];
 Node *expr();
 void program();
 
