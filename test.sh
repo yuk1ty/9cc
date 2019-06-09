@@ -33,5 +33,8 @@ try 1 "0<=1;"
 try 1 "42>=42;"
 try 1 "42<=42;"
 try 3 "a = 1; b = 2; c = a + b; c;"
+try 2 "a = 1; b = 2; c = a * b; c;"
+try 9 "a = 1; b = 2; c = 3; d = (a + b) * 3; d;"
+try 1 "a = 42; b = 21; c = a > b; c;"
 
 echo OK
