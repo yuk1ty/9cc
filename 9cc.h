@@ -21,6 +21,7 @@ enum {
     TK_NE, // !=
     TK_LE, // <=
     TK_GE, // >=
+    TK_RETURN, // return
     TK_EOF,
 };
 
